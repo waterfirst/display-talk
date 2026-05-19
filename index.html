@@ -205,13 +205,11 @@ li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); 
 
 <!-- Slide 1: Cover — 붓글씨 스타일 -->
 <div class="slide slide-cover active" id="s1">
-  <div class="cover-bg"></div>
-  <!-- 바둑판 느낌 격자 배경 -->
+  <!-- 커버 배경 이미지 -->
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;
+    background:url('cover_image.png') center/cover no-repeat;"></div>
   <div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;
-    background-image:
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;"></div>
+    background:linear-gradient(180deg, rgba(15,15,26,0.3) 0%, rgba(15,15,26,0.7) 50%, rgba(15,15,26,0.9) 100%);"></div>
   <div style="position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
     <!-- 상단 날짜 -->
     <p class="small" style="letter-spacing:4px;margin-bottom:24px;opacity:0.6;">University Guest Lecture</p>
