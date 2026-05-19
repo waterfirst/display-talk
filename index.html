@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>디스플레이 산업 소개 & Talk</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap');
+
+:root {
+  --bg: #0f0f1a;
+  --card: #1a1a2e;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --text: #e8e8f0;
+  --muted: #8888aa;
+  --gradient: linear-gradient(135deg, #00d4ff, #7c3aed);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  height: 100vh;
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 60px;
+  display: none;
+  flex-direction: column;
+  padding: 30px 40px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.slide.active { display: flex; opacity: 1; }
+
+/* 스크롤바 스타일 */
+.slide::-webkit-scrollbar { width: 4px; }
+.slide::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 4px; }
+.slide::-webkit-scrollbar-track { background: transparent; }
+
+.nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  align-items: center;
+  z-index: 100;
+  background: rgba(15,15,26,0.95);
+  padding: 12px 20px;
+  border-top: 1px solid rgba(0,212,255,0.15);
+  backdrop-filter: blur(10px);
+}
+
+.nav button {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text);
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s;
+}
+
+.nav button:hover { border-color: var(--accent); color: var(--accent); }
+.page-num { font-size: 13px; color: var(--muted); min-width: 50px; text-align: center; }
+
+.progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: var(--gradient);
+  transition: width 0.3s;
+  z-index: 100;
+}
+
+h1 {
+  font-size: 2.8em;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 { font-size: 1.8em; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+h3 { font-size: 1.1em; font-weight: 500; color: var(--accent); margin-bottom: 8px; }
+p, li { font-size: 1em; line-height: 1.7; color: #ccccdd; font-weight: 300; }
+.subtitle { font-size: 1.1em; color: var(--muted); font-weight: 300; margin-top: 6px; }
+.small { font-size: 0.85em; color: var(--muted); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; width: 100%; }
+
+.card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 18px;
+  transition: all 0.3s;
+}
+
+.card:hover { border-color: rgba(0,212,255,0.3); }
+.card-icon { font-size: 1.8em; margin-bottom: 8px; }
+
+.stat-row { display: flex; gap: 30px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-num { font-size: 2.2em; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stat-label { font-size: 0.85em; color: var(--muted); margin-top: 2px; }
+
+.highlight-box {
+  background: rgba(0,212,255,0.05);
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 10px;
+  padding: 14px 20px;
+  width: 100%;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.75em;
+  font-weight: 500;
+  margin: 2px;
+}
+.tag-blue { background: rgba(0,212,255,0.15); color: #00d4ff; }
+.tag-purple { background: rgba(124,58,237,0.15); color: #a78bfa; }
+.tag-amber { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.tag-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+.tag-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+.author-info {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  font-size: 1em;
+  color: var(--muted);
+}
+
+.cover-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(0,212,255,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 50%, rgba(124,58,237,0.08) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.slide-cover {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+ul { list-style: none; padding: 0; }
+li { padding: 3px 0; padding-left: 16px; position: relative; font-size: 0.95em; }
+li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+
+/* 붓글씨 커버 모바일 대응 */
+@media (max-width: 480px) {
+  #s1 [style*="font-size:4.5em"] { font-size: 2.8em !important; }
+  #profile-area { width: 90px !important; height: 90px !important; }
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+  .slide { padding: 20px 16px; }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.4em; margin-bottom: 12px; }
+  h3 { font-size: 1em; }
+  p, li { font-size: 0.9em; }
+  .two-col { grid-template-columns: 1fr; gap: 10px; }
+  .three-col { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card { padding: 14px; }
+  .card-icon { font-size: 1.4em; margin-bottom: 4px; }
+  .stat-row { gap: 16px; }
+  .stat-num { font-size: 1.6em; }
+  .author-info { font-size: 0.9em; padding: 10px 16px; }
+  .subtitle { font-size: 0.95em; }
+}
+
+/* 태블릿 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .slide { padding: 24px 30px; }
+  h1 { font-size: 2.4em; }
+  .three-col { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- Slide 1: Cover — 붓글씨 스타일 -->
+<div class="slide slide-cover active" id="s1">
+  <div class="cover-bg"></div>
+  <!-- 바둑판 느낌 격자 배경 -->
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;"></div>
+  <div style="position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+    <!-- 상단 날짜 -->
+    <p class="small" style="letter-spacing:4px;margin-bottom:24px;opacity:0.6;">University Guest Lecture</p>
+
+    <!-- 프로필 사진 영역 -->
+    <div id="profile-area" style="width:120px;height:120px;border-radius:50%;
+      background:linear-gradient(135deg, rgba(0,212,255,0.3), rgba(124,58,237,0.3));
+      border:2px solid rgba(0,212,255,0.4);margin-bottom:28px;
+      display:flex;align-items:center;justify-content:center;overflow:hidden;
+      box-shadow: 0 0 40px rgba(0,212,255,0.15);">
+      <img id="profile-img" src="" style="width:100%;height:100%;object-fit:cover;display:none;" />
+      <span style="font-size:2.4em;opacity:0.5;" id="profile-placeholder">👤</span>
+    </div>
+
+    <!-- 메인 카피 — 붓글씨체 -->
+    <div style="margin-bottom:8px;">
+      <span style="font-family:'Nanum Brush Script',cursive;font-size:4.5em;
+        color:#fff;line-height:1.1;display:block;
+        text-shadow: 0 0 30px rgba(0,212,255,0.3), 0 0 60px rgba(124,58,237,0.15);
+        letter-spacing: -2px;">
+        픽셀 너머의 세계
+      </span>
+    </div>
+
+    <!-- 서브 타이틀 -->
+    <p style="font-size:1.15em;color:var(--muted);font-weight:300;margin-bottom:30px;letter-spacing:1px;">
+      디스플레이 산업 소개 & Talk
+    </p>
+
+    <!-- 저자 정보 카드 -->
+    <div style="display:inline-flex;align-items:center;gap:16px;
+      padding:14px 28px;background:rgba(255,255,255,0.04);
+      border:1px solid rgba(0,212,255,0.12);border-radius:50px;
+      backdrop-filter:blur(10px);">
+      <div style="text-align:left;">
+        <div style="font-size:1.05em;font-weight:700;color:var(--text);">Speaker</div>
+        <div style="font-size:0.8em;color:var(--muted);margin-top:2px;">OLED Engineer · 25 Years · SID Speaker</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 2: 시장과 기술 흐름 -->
+<div class="slide" id="s2">
+  <h2>디스플레이 시장 — 지금 어디에 있나</h2>
+  <div class="stat-row">
+    <div>
+      <div class="stat-num">$180B</div>
+      <div class="stat-label">글로벌 시장 (2026)</div>
+    </div>
+    <div>
+      <div class="stat-num">OLED 52%</div>
+      <div class="stat-label">LCD 역전 원년</div>
+    </div>
+    <div>
+      <div class="stat-num">3강</div>
+      <div class="stat-label">삼성 · LG · BOE</div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <h3>기술 흐름</h3>
+      <ul>
+        <li><strong>OLED 확산</strong> — 폰→노트북→TV→자동차</li>
+        <li><strong>폴더블 진화</strong> — 주름 제로, 중국 추격</li>
+        <li><strong>FMM-Free</strong> — 마스크 없는 OLED</li>
+        <li><strong>Micro LED</strong> — 차세대, 연구 단계</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>업황</h3>
+      <ul>
+        <li><strong>OLED</strong> — IT/Auto 확대, 호황</li>
+        <li><strong>LCD</strong> — 중국 과잉, 가격 경쟁</li>
+        <li><strong>신사업</strong> — Glass Interposer (반도체)</li>
+        <li><strong>AI 융합</strong> — 불량 예측, 자동화</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 3: SID 2026 트렌드 -->
+<div class="slide" id="s3">
+  <h2>SID 2026 — 3주 전 LA 현장 트렌드</h2>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-icon">🚗</div>
+      <h3>Dual View Display</h3>
+      <p>운전자: 내비 / 동승자: 영화<br>하나의 화면에 두 개의 영상</p>
+      <span class="tag tag-blue">Sharp</span> <span class="tag tag-purple">차량용 핵심</span>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧪</div>
+      <h3>FMM-Free 공정</h3>
+      <p>마스크 없이 RGB 패터닝<br>Visionox: 증착+식각 / CSOT: 잉크젯</p>
+      <span class="tag tag-purple">원가 혁신</span>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔗</div>
+      <h3>Glass Interposer</h3>
+      <p>디스플레이 유휴 장비로<br>반도체 패키징 기판 제조</p>
+      <span class="tag tag-green">신규 사업</span>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <h3>AI + 제조</h3>
+      <p>불량 자동 검출 (딥러닝)<br>공정 예측, 데이터 자동화</p>
+      <span class="tag tag-red">차별화 무기</span>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: 직무 소개 -->
+<div class="slide" id="s4">
+  <h2>디스플레이 — 어떤 직무가 있나?</h2>
+  <div class="three-col">
+    <div class="card">
+      <div class="card-icon">⚙️</div>
+      <h3>공정 개발</h3>
+      <p>TFT·증착·봉지·셀<br>새 기술 → 양산</p>
+      <span class="tag tag-blue">물리·화학·재료</span>
+    </div>
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <h3>품질 / 신뢰성</h3>
+      <p>소자 열화·불량 원인<br>고객 품질 대응</p>
+      <span class="tag tag-purple">전자·물리</span>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏭</div>
+      <h3>제조 기술</h3>
+      <p>수율 관리·장비 최적화<br>24시간 공장 운영</p>
+      <span class="tag tag-amber">기계·전기</span>
+    </div>
+    <div class="card">
+      <div class="card-icon">📐</div>
+      <h3>설계</h3>
+      <p>픽셀 회로·드라이버 IC<br>패널 레이아웃</p>
+      <span class="tag tag-green">전자·회로</span>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔬</div>
+      <h3>연구 (선행)</h3>
+      <p>차세대 기술 탐색<br>학회·특허</p>
+      <span class="tag tag-blue">석·박사 우대</span>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <h3>AI / 데이터</h3>
+      <p>공정 데이터 분석<br>불량 예측·자동화</p>
+      <span class="tag tag-red">NEW!</span>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:14px;">
+    <p style="font-size:0.95em;">💡 <strong>Tip:</strong> "나는 OO 분야에서 XX 경험을 했고, 귀사의 YY에 기여하고 싶다" — 이 한 문장을 만들 수 있으면 면접 절반 성공</p>
+  </div>
+</div>
+
+<!-- Slide 5: Q&A -->
+<div class="slide slide-cover" id="s5">
+  <div style="text-align:center;">
+    <h1>Q & A</h1>
+    <p class="subtitle" style="margin-top:12px;">
+      궁금한 거 뭐든 물어보세요<br>
+      면접 팁, 연봉, 진로 고민 — 다 OK
+    </p>
+    <div class="highlight-box" style="margin-top:30px;display:inline-block;">
+      <p style="font-size:1em;">"여러분이 만든 디스플레이가 전 세계 10억 명의 손에 들려있는 경험,<br>
+      해보면 압니다. 그 뿌듯함을."</p>
+    </div>
+    <p style="margin-top:30px;font-size:0.9em;color:var(--muted);">
+      Speaker · OLED Engineer · 25 Years
+    </p>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <button onclick="prevSlide()">◀</button>
+  <span class="page-num" id="pageNum">1 / 5</span>
+  <button onclick="nextSlide()">▶</button>
+</nav>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+
+function showSlide(n) {
+  slides[current].classList.remove('active');
+  current = (n + total) % total;
+  slides[current].classList.add('active');
+  slides[current].scrollTop = 0;
+  document.getElementById('pageNum').textContent = `${current + 1} / ${total}`;
+  document.getElementById('progress').style.width = `${((current + 1) / total) * 100}%`;
+}
+
+function nextSlide() { showSlide(current + 1); }
+function prevSlide() { showSlide(current - 1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+});
+
+let touchStartX = 0, touchStartY = 0;
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+});
+document.addEventListener('touchend', e => {
+  const dx = touchStartX - e.changedTouches[0].clientX;
+  const dy = touchStartY - e.changedTouches[0].clientY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+    dx > 0 ? nextSlide() : prevSlide();
+  }
+});
+
+showSlide(0);
+</script>
+</body>
+</html>
